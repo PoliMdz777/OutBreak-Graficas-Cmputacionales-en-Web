@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OUTBREAK — Red Multijugador</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/Multiplayer.css" />
+</head>
+<body>
+
+<div class="bg-overlay"></div>
+<div class="scan-line"></div>
+<div class="vignette"></div>
+<div class="hud-border"></div>
+
+<div class="screen">
+  <div class="top-bar">
+    <div>
+      <div class="stamp"><p>SISTEMA</p><p>MULTIPLAYER</p></div>
+    </div>
+    <div style="font-size:11px; color:var(--text-dim); letter-spacing:2px;">ENLACE SATELITAL ACTIVO</div>
+  </div>
+
+  <div id="view-browser" class="view-panel active">
+    <div class="screen-header">
+      <h1 class="screen-title">TERMINALES DE COMBATE EN LÍNEA</h1>
+      <button class="btn-tactic" onclick="window.location.href='Menu.html'">← MENU PRINCIPAL</button>
+    </div>
+    <div class="browser-layout">
+      <div class="action-row">
+        <button class="btn-tactic btn-large" onclick="switchView('view-create')">CREAR PARTIDA</button>
+      </div>
+      <div class="server-list-container">
+        <table class="server-table">
+          <thead>
+            <tr>
+              <th>NOMBRE DE LA SALA</th>
+              <th>MODO DE JUEGO</th>
+              <th>JUGADORES</th>
+              <th>ESTADO</th>
+              <th>ACCION</th>
+            </tr>
+          </thead>
+          <tbody id="lobby-table-body">
+            </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-create" class="view-panel">
+    <div class="screen-header">
+      <h1 class="screen-title">CONFIGURAR NUEVO DESPLIEGUE</h1>
+      <button class="btn-tactic" onclick="switchView('view-browser')">✕ CANCELAR</button>
+    </div>
+    <div class="form-container">
+      <div class="form-group">
+        <label>Nombre del Escuadrón / Sala</label>
+        <input type="text" id="f-name" class="form-input" value="Equipo Dinamita" placeholder="Introduce el nombre...">
+      </div>
+      <div class="form-row-grid">
+        <div class="form-group">
+          <label>Modo de Juego</label>
+          <select id="f-mode" class="form-input">
+            <option value="Supervivencia">Supervivencia</option>
+            <option value="Escape">Escape</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Máximo Jugadores</label>
+          <select id="f-max" class="form-input">
+            <option value="4">4 Jugadores (Máx)</option>
+            <option value="3">3 Jugadores</option>
+            <option value="2">2 Jugadores</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row-grid">
+        <div class="form-group">
+          <label>Acceso Corporativo</label>
+          <select id="f-privacy" class="form-input" onchange="togglePasswordInput(this.value)">
+            <option value="publica">Pública</option>
+            <option value="privada">Privada (Con Contraseña)</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Contraseña</label>
+          <input type="password" id="f-pass" class="form-input" placeholder="••••" disabled>
+        </div>
+      </div>
+      <div style="text-align: center; margin-top: 15px;">
+        <button class="btn-tactic btn-large" style="width: 100%;" onclick="procesarCreacionSala()">ESTABLECER SALA</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="view-room" class="view-panel">
+    <div class="screen-header">
+      <h1 class="screen-title" id="room-display-name">SALA MULTIJUGADOR</h1>
+      <button class="btn-tactic" onclick="abandonarSala()">ABANDONAR SALA</button>
+    </div>
+    <div class="room-layout">
+      
+      <div class="squad-panel">
+        <div class="squad-title">INTEGRANTES DEL EQUIPO</div>
+        <div id="squad-slots-list">
+          </div>
+      </div>
+
+      <div class="voting-panel">
+        
+        <div id="room-waiting-state">
+          <div class="waiting-title">ESPERANDO DESPLIEGUE</div>
+          
+          <p id="guest-waiting-msg" style="color: var(--text-dim); font-size: 16px; margin-bottom: 20px; letter-spacing: 1px;">
+            A LA ESPERA DE QUE EL ANFITRIÓN INICIE LA SELECCIÓN DE MAPA...
+          </p>
+
+          <button id="host-start-btn" class="btn-tactic btn-large btn-start" onclick="iniciarFaseVotacion()" style="display: none;">
+            INICIAR SELECCIÓN DE MAPA
+          </button>
+        </div>
+
+        <div id="room-voting-state">
+          <div class="voting-header">
+            <div style="font-size: 11px; letter-spacing: 2px; color: var(--text-dim);">FASE DE SELECCIÓN DE MAPA CERCANO</div>
+            <div class="timer-alert">SISTEMA CERRARÁ EN: <span id="vote-timer">15</span>s</div>
+          </div>
+          
+          <div class="maps-voting-grid" id="voting-maps-grid">
+            </div>
+
+          <div style="text-align: center; font-size: 12px; color: var(--text-dim); letter-spacing: 1px;">
+            * El sistema validará la mayoría de votos al terminar el tiempo.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="sys-alert">SALA DE CRISIS OMNIC // PROTOCOLO DE CONEXIÓN SEGURO</div>
+    <div style="font-size: 11px; color: var(--text-dim);">RED GLOBAL APOCALIPSIS v1.0.8</div>
+  </div>
+</div>
+
+<script>
+  // Banco de Mapas globales
+  const mapDatabase = [
+    { id: 0, name: "CIUDAD DEVASTADA", votes: 0, image: "multimedia/ciudad_devastada.png" },
+    { id: 1, name: "HOSPITAL INFECTADO", votes: 0, image: "multimedia/hospital_infectado.jpg" },
+    { id: 2, name: "AEROPUERTO CAÍDO", votes: 0, image: "multimedia/aeropuerto_caido.png" }
+  ];
+
+  // Datos del Servidor Simulados en memoria local
+  let lobbies = [
+    { id: 101, name: "Escuadrón Alfa", mode: "Supervivencia", players: 3, max: 4, private: false, status: "waiting" },
+    { id: 102, name: "Zona Cero", mode: "Escape", players: 2, max: 4, private: true, status: "waiting" },
+    { id: 103, name: "Los Últimos", mode: "Supervivencia", players: 4, max: 4, private: false, status: "started" } 
+  ];
+
+  let currentRoom = null;
+  let roomTimerInterval = null;
+  let botJoinInterval = null;
+  let botVoteInterval = null;
+  let simularAnfitrionInterval = null; // Para iniciar si eres invitado en la demo
+  let hasVoted = false;
+
+  // Renderizar la tabla de partidas del Buscador
+  function renderLobbies() {
+    const tbody = document.getElementById('lobby-table-body');
+    tbody.innerHTML = "";
+    
+    const activeLobbies = lobbies.filter(l => l.status === "waiting");
+
+    if(activeLobbies.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-dim); padding:20px;">NO SE ENCONTRARON TRANSMISIONES DE SALAS ACTIVAS...</td></tr>`;
+      return;
+    }
+
+    activeLobbies.forEach(lobby => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-weight:600; letter-spacing:1px; color:#fff;">${lobby.name}</td>
+        <td>${lobby.mode}</td>
+        <td>${lobby.players}/${lobby.max}</td>
+        <td>
+          <span class="status-badge ${lobby.private ? 'status-private' : 'status-waiting'}">
+            ${lobby.private ? '🔒 PRIVADO' : '🔓 PÚBLICO'}
+          </span>
+        </td>
+        <td>
+          <button class="btn-tactic" onclick="unirseASala(${lobby.id})">CONECTAR</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function switchView(viewId) {
+    document.querySelectorAll('.view-panel').forEach(panel => panel.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    
+    if(viewId === 'view-browser') {
+      limpiarIntervalos();
+      renderLobbies();
+    }
+  }
+
+  function togglePasswordInput(val) {
+    document.getElementById('f-pass').disabled = (val === 'publica');
+    if(val === 'publica') document.getElementById('f-pass').value = '';
+  }
+
+  // 1. EL USUARIO CREA LA SALA (Es el Anfitrión)
+  function procesarCreacionSala() {
+    const name = document.getElementById('f-name').value.trim();
+    const mode = document.getElementById('f-mode').value;
+    const max = parseInt(document.getElementById('f-max').value);
+    const isPrivate = document.getElementById('f-privacy').value === 'privada';
+    const password = document.getElementById('f-pass').value;
+
+    if(!name) return alert("Por favor introduce un nombre para el escuadrón.");
+    if(isPrivate && !password) return alert("Las salas privadas requieren clave de encriptación.");
+
+    currentRoom = {
+      name: name.toUpperCase(),
+      mode: mode,
+      maxPlayers: max,
+      isHost: true, // ¡Eres el jefe!
+      playersList: [{ name: "TÚ (ANFITRIÓN)", role: "HOST" }]
+    };
+
+    abrirSalaMultijugador();
+  }
+
+  // 2. EL USUARIO SE UNE (Es un Invitado)
+  function unirseASala(id) {
+    const salaSeleccionada = lobbies.find(l => l.id === id);
+    if(!salaSeleccionada) return;
+
+    if(salaSeleccionada.private) {
+      const passInput = prompt("ESTA TRANSMISIÓN ESTÁ ENCRIPTADA. INTRODUCE LA CONTRASEÑA:");
+      if(!passInput) return;
+    }
+
+    currentRoom = {
+      name: salaSeleccionada.name.toUpperCase(),
+      mode: salaSeleccionada.mode,
+      maxPlayers: salaSeleccionada.max,
+      isHost: false, // Eres un invitado
+      playersList: [
+        { name: "Anfitrión_Alpha", role: "HOST" },
+        { name: "TÚ", role: "JUGADOR" }
+      ]
+    };
+
+    if(salaSeleccionada.players > 2) {
+      currentRoom.playersList.push({ name: "Hunter_99", role: "JUGADOR" });
+    }
+
+    abrirSalaMultijugador();
+  }
+
+  // Abre la interfaz gráfica de la sala
+  function abrirSalaMultijugador() {
+    switchView('view-room');
+    document.getElementById('room-display-name').textContent = `ESCUADRÓN: ${currentRoom.name} [MODO ${currentRoom.mode.toUpperCase()}]`;
+    
+    // Resetear base de votos y vistas
+    mapDatabase.forEach(m => m.votes = 0);
+    hasVoted = false;
+    
+    document.getElementById('room-waiting-state').style.display = 'flex';
+    document.getElementById('room-voting-state').style.display = 'none';
+
+    // Determinar qué botones mostrar dependiendo de si eres anfitrión o no
+    if(currentRoom.isHost) {
+      document.getElementById('host-start-btn').style.display = 'inline-block';
+      document.getElementById('guest-waiting-msg').style.display = 'none';
+    } else {
+      document.getElementById('host-start-btn').style.display = 'none';
+      document.getElementById('guest-waiting-msg').style.display = 'block';
+      
+      // Simulación: Si eres invitado, el anfitrión bot iniciará la partida en 6 segundos automáticamente
+      simularAnfitrionInterval = setTimeout(() => {
+        iniciarFaseVotacion();
+      }, 6000);
+    }
+
+    actualizarInterfazEscuadron();
+    
+    // Solo simulamos que se une gente, no activamos la votación aún.
+    iniciarSimulacionUnionDeBots();
+  }
+
+  // Dibuja los integrantes
+  function actualizarInterfazEscuadron() {
+    const container = document.getElementById('squad-slots-list');
+    container.innerHTML = "";
+
+    currentRoom.playersList.forEach(p => {
+      const el = document.createElement('div');
+      el.className = "player-slot";
+      el.innerHTML = `
+        <div class="player-avatar">${p.name.substring(0,2).toUpperCase()}</div>
+        <div class="player-name">${p.name}</div>
+        <div class="player-status">${p.role}</div>
+      `;
+      container.appendChild(el);
+    });
+
+    const vacios = currentRoom.maxPlayers - currentRoom.playersList.length;
+    for(let i=0; i<vacios; i++) {
+      const el = document.createElement('div');
+      el.className = "player-slot empty";
+      el.textContent = "ESPERANDO CONEXIÓN...";
+      container.appendChild(el);
+    }
+  }
+
+  // Simular que llegan jugadores a la sala de espera
+  function iniciarSimulacionUnionDeBots() {
+    limpiarIntervalos(); // Limpia los demás por si acaso
+    botJoinInterval = setInterval(() => {
+      if(currentRoom.playersList.length < currentRoom.maxPlayers) {
+        const nombresBot = ["Specter_Tactical", "Ghost_Pro", "ZombieSlayer", "RedOutbreak"];
+        const botName = nombresBot[Math.floor(Math.random() * nombresBot.length)];
+        
+        if(!currentRoom.playersList.some(p => p.name === botName)) {
+          currentRoom.playersList.push({ name: botName, role: "JUGADOR" });
+          actualizarInterfazEscuadron();
+        }
+      }
+    }, 3000);
+  }
+
+  // ===== INICIO DE FASE DE VOTACIÓN (Accionado por el Anfitrión) =====
+  function iniciarFaseVotacion() {
+    if(simularAnfitrionInterval) clearTimeout(simularAnfitrionInterval);
+
+    // Cambiar la interfaz de la columna derecha
+    document.getElementById('room-waiting-state').style.display = 'none';
+    document.getElementById('room-voting-state').style.display = 'flex';
+
+    renderTarjetasVotacion();
+
+    // Iniciar temporizador
+    let tiempoRestante = 15;
+    const timerText = document.getElementById('vote-timer');
+    timerText.textContent = tiempoRestante;
+
+    roomTimerInterval = setInterval(() => {
+      tiempoRestante--;
+      timerText.textContent = tiempoRestante;
+      if(tiempoRestante <= 0) {
+        limpiarIntervalos();
+        evaluarGanadorYDesplegar();
+      }
+    }, 1000);
+
+    // Los bots empiezan a votar
+    botVoteInterval = setInterval(() => {
+      if(currentRoom.playersList.length > 1) {
+        const mapaAleatorio = mapDatabase[Math.floor(Math.random() * mapDatabase.length)];
+        mapaAleatorio.votes += 1;
+        document.getElementById(`vc-${mapaAleatorio.id}`).textContent = `${mapaAleatorio.votes} VOTOS`;
+      }
+    }, 1800);
+  }
+
+  function renderTarjetasVotacion() {
+    const container = document.getElementById('voting-maps-grid');
+    container.innerHTML = "";
+
+    mapDatabase.forEach(m => {
+      const card = document.createElement('div');
+      card.className = `map-vote-card ${hasVoted && m.userVoted ? 'voted' : ''}`;
+      card.onclick = () => registrarVotoUsuario(m.id);
+      card.innerHTML = `
+        <div class="vote-counter-bubble" id="vc-${m.id}">${m.votes} VOTOS</div>
+        <img src="${m.image}" alt="${m.name}" onerror="this.style.opacity='0.2';">
+        <div class="map-vote-info">
+          <div class="map-vote-title">${m.name}</div>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function registrarVotoUsuario(mapId) {
+    if(hasVoted) return; 
+    hasVoted = true;
+    const mapa = mapDatabase.find(m => m.id === mapId);
+    mapa.votes += 1;
+    mapa.userVoted = true;
+    renderTarjetasVotacion();
+  }
+
+  function evaluarGanadorYDesplegar() {
+    let mapaGanador = mapDatabase[0];
+    mapDatabase.forEach(m => {
+      if(m.votes > mapaGanador.votes) mapaGanador = m;
+    });
+
+    alert(`¡FASE TERMINADA!\n\nMayoría de votos alcanzada para:\n👉 ${mapaGanador.name} 👈\n\nIniciando despliegue de escuadrón...`);
+    
+    if(currentRoom.isHost) {
+      const matchInLobbies = lobbies.find(l => l.name === currentRoom.name);
+      if(matchInLobbies) matchInLobbies.status = "started";
+    }
+
+    // Redirección inyectando el mapa en el link
+    window.location.href = `game.html?map=${encodeURIComponent(mapaGanador.name)}`;
+  }
+
+  function abandonarSala() {
+    if(confirm("¿Seguro que deseas romper el enlace de comunicación con el escuadrón?")) {
+      switchView('view-browser');
+    }
+  }
+
+  function limpiarIntervalos() {
+    if(roomTimerInterval) clearInterval(roomTimerInterval);
+    if(botJoinInterval) clearInterval(botJoinInterval);
+    if(botVoteInterval) clearInterval(botVoteInterval);
+    if(simularAnfitrionInterval) clearTimeout(simularAnfitrionInterval);
+  }
+
+  // Arranque Inicial
+  renderLobbies();
+</script>
+</body>
+</html>

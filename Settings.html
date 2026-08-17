@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OUTBREAK — Configuración</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/Settings.css" />
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div id="cursor">
+    <div id="cursor-ring"><div id="cursor-dot"></div></div>
+  </div>
+
+  <!-- Fondo — mismo video que Menu y Scores -->
+  <video id="bg-video" autoplay loop muted playsinline>
+    <source src="multimedia/Menu.mp4" type="video/mp4">
+  </video>
+  <div id="vignette"></div>
+  <div id="grad-bottom"></div>
+  <div id="scan"></div>
+  <div id="hud-border"></div>
+
+  <div id="app">
+
+    <!-- TOP LEFT — idéntico a Menu/Scores -->
+    <div id="header">
+      <div class="stamp">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <p>EQUIPO</p><p>OMNIC</p>
+      </div>
+      <p class="eyebrow">Protocolo de emergencia</p>
+    </div>
+
+    <!-- TOP RIGHT -->
+    <div id="top-right">
+      <span class="red-dot"></span> v1.0.0 - 2026
+    </div>
+
+    <!-- MIDDLE — panel principal -->
+    <div id="middle">
+
+      <div class="screen-header">
+        <h1 class="screen-title">CONFIGURACIÓN</h1>
+        <button class="back-btn" onclick="location.href='Menu.html'">← REGRESAR</button>
+      </div>
+
+      <div class="config-panel">
+        <div class="config-grid">
+
+          <!-- AUDIO -->
+          <div class="config-section">
+            <div class="section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              AUDIO
+            </div>
+            <div class="config-row">
+              <span class="config-label">Música</span>
+              <div class="slider-container">
+                <input type="range" id="musicVolume" class="red-fill" min="0" max="100" value="100" oninput="syncSlider(this,'musicVal')">
+                <span class="slider-val" id="musicVal">100</span>
+              </div>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Efectos</span>
+              <div class="slider-container">
+                <input type="range" id="sfxVolume" class="red-fill" min="0" max="100" value="45" oninput="syncSlider(this,'sfxVal')">
+                <span class="slider-val" id="sfxVal">45</span>
+              </div>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Ambiente</span>
+              <div class="slider-container">
+                <input type="range" id="ambientVolume" class="red-fill" min="0" max="100" value="55" oninput="syncSlider(this,'ambVal')">
+                <span class="slider-val" id="ambVal">55</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CONTROLES -->
+          <div class="config-section">
+            <div class="section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h4"/><path d="M8 10v4"/><circle cx="16" cy="12" r="1" fill="currentColor"/><circle cx="18.5" cy="10" r="1" fill="currentColor"/></svg>
+              CONTROLES
+            </div>
+            <div class="config-row">
+              <span class="config-label">Sensibilidad</span>
+              <div class="slider-container">
+                <input type="range" id="sensitivity" class="red-fill" min="1" max="100" value="82" oninput="syncSlider(this,'sensVal')">
+                <span class="slider-val" id="sensVal">82</span>
+              </div>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Invertir eje Y</span>
+              <label class="toggle">
+                <input type="checkbox" id="invertY">
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Vibración</span>
+              <label class="toggle">
+                <input type="checkbox" id="vibration" checked>
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+
+          <!-- GRÁFICOS -->
+          <div class="config-section">
+            <div class="section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+              GRÁFICOS
+            </div>
+            <div class="config-row">
+              <span class="config-label">Calidad</span>
+              <select id="quality">
+                <option value="low">BAJA</option>
+                <option value="medium">MEDIA</option>
+                <option value="high" selected>ALTA</option>
+                <option value="ultra">ULTRA</option>
+              </select>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Resolución</span>
+              <select id="resolution">
+                <option value="1280x720">1280×720</option>
+                <option value="1920x1080" selected>1920×1080</option>
+                <option value="2560x1440">2560×1440</option>
+              </select>
+            </div>
+            <div class="config-row">
+              <span class="config-label">Sombras</span>
+              <label class="toggle">
+                <input type="checkbox" id="shadows" checked>
+                <div class="toggle-track"></div>
+                <div class="toggle-thumb"></div>
+              </label>
+            </div>
+          </div>
+
+          <!-- PERFIL -->
+          <div class="config-section">
+            <div class="section-title">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              PERFIL
+            </div>
+            <div class="config-row">
+              <span class="config-label">Nombre</span>
+              <input type="text" id="playerName" value="NeroDubs" style="width:140px;">
+            </div>
+            <div class="config-row">
+              <span class="config-label">Idioma</span>
+              <select id="language">
+                <option value="es" selected>ESPAÑOL</option>
+                <option value="en">ENGLISH</option>
+              </select>
+            </div>
+          </div>
+
+        </div><!-- /.config-grid -->
+
+        <!-- Botones dentro del panel -->
+        <div class="save-area">
+          <button class="btn btn-dim" onclick="resetConfig()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+            RESTABLECER
+          </button>
+          <button class="btn btn-primary" onclick="saveConfig()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            GUARDAR
+          </button>
+        </div>
+
+      </div><!-- /.config-panel -->
+
+    </div><!-- /#middle -->
+
+    <!-- BOTTOM LEFT — idéntico a Menu/Scores -->
+    <div id="footer">
+      <div class="coord-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/><path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"/><path d="M12 9V5M9.40192 13.5L5.93782 15.5M14.5981 13.5L18.0622 15.5"/></svg>
+      </div>
+      <div class="coord-group">
+        <span class="coord-label">+ Latitud</span>
+        <span class="coord-val">25.6866° N</span>
+      </div>
+      <div class="coord-sep"></div>
+      <div class="coord-group">
+        <span class="coord-label">Longitud</span>
+        <span class="coord-val">100.3161° W</span>
+      </div>
+      <div class="coord-sep"></div>
+      <div class="coord-group">
+        <span class="coord-label">Altitud +</span>
+        <span class="coord-val">538m</span>
+      </div>
+    </div>
+
+    <!-- BOTTOM RIGHT — idéntico a Menu/Scores -->
+    <div id="system-status">
+      <p class="sys-label"><span class="red-dot"></span> ESTADO DEL SISTEMA</p>
+      <div class="alert-row">
+        <p class="sys-alert">ALERTA ROJA</p>
+        <svg class="ekg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h4l2 -6 4 12 2 -6h6"/></svg>
+      </div>
+      <p class="sys-threat">NIVEL DE AMENAZA: <span class="threat-red">CRÍTICO</span></p>
+      <p class="sys-footer">Primera Entrega</p>
+    </div>
+
+  </div><!-- /#app -->
+
+  <script>
+    // ── Cursor ──
+    const cur = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cur.style.left = e.clientX + 'px';
+      cur.style.top  = e.clientY + 'px';
+    });
+
+    // ── Sincronizar slider: valor visible + relleno rojo ──
+    function syncSlider(el, valId) {
+      document.getElementById(valId).textContent = el.value;
+      const pct = ((el.value - el.min) / (el.max - el.min) * 100).toFixed(1) + '%';
+      el.style.setProperty('--pct', pct);
+    }
+
+    // Inicializar relleno visual de todos los sliders
+    document.querySelectorAll('input[type="range"].red-fill').forEach(s => {
+      const pct = ((s.value - s.min) / (s.max - s.min) * 100).toFixed(1) + '%';
+      s.style.setProperty('--pct', pct);
+    });
+
+    // ── Persistencia ──
+    const KEY = 'outbreak_config';
+
+    function loadConfig() {
+      const cfg = JSON.parse(localStorage.getItem(KEY) || '{}');
+      const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+      const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+      const setChk = (id, val) => { const el = document.getElementById(id); if (el) el.checked = val; };
+
+      set('musicVolume',    cfg.musicVolume   ?? 100); setTxt('musicVal', cfg.musicVolume   ?? 100);
+      set('sfxVolume',      cfg.sfxVolume     ?? 45);  setTxt('sfxVal',   cfg.sfxVolume     ?? 45);
+      set('ambientVolume',  cfg.ambientVolume ?? 55);  setTxt('ambVal',   cfg.ambientVolume ?? 55);
+      set('sensitivity',    cfg.sensitivity   ?? 82);  setTxt('sensVal',  cfg.sensitivity   ?? 82);
+      setChk('invertY',     cfg.invertY       ?? false);
+      setChk('vibration',   cfg.vibration     ?? true);
+      setChk('shadows',     cfg.shadows       ?? true);
+      set('quality',        cfg.quality       ?? 'high');
+      set('resolution',     cfg.resolution    ?? '1920x1080');
+      set('playerName',     cfg.playerName    ?? 'NeroDubs');
+      set('language',       cfg.language      ?? 'es');
+
+      // Re-sync visual de sliders tras cargar
+      document.querySelectorAll('input[type="range"].red-fill').forEach(s => {
+        const pct = ((s.value - s.min) / (s.max - s.min) * 100).toFixed(1) + '%';
+        s.style.setProperty('--pct', pct);
+      });
+    }
+
+    function saveConfig() {
+      const g = id => document.getElementById(id);
+      const cfg = {
+        musicVolume:   +g('musicVolume').value,
+        sfxVolume:     +g('sfxVolume').value,
+        ambientVolume: +g('ambientVolume').value,
+        sensitivity:   +g('sensitivity').value,
+        invertY:        g('invertY').checked,
+        vibration:      g('vibration').checked,
+        shadows:        g('shadows').checked,
+        quality:        g('quality').value,
+        resolution:     g('resolution').value,
+        playerName:     g('playerName').value || 'NeroDubs',
+        language:       g('language').value,
+      };
+      localStorage.setItem(KEY, JSON.stringify(cfg));
+      alert('✔ Configuración guardada en protocolo de emergencia.');
+    }
+
+    function resetConfig() {
+      localStorage.removeItem(KEY);
+      loadConfig();
+    }
+
+    loadConfig();
+  </script>
+</body>
+</html>

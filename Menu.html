@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OUTBREAK — Survival Horror</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Special+Elite&family=Russo+One&family=Oswald:wght@300;400;600&family=Black+Ops+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/Menu.css" />
+</head>
+<body>
+
+<video id="bg-gif" autoplay muted playsinline>
+  <source src="multimedia/Menu.mp4" type="video/mp4">
+</video>
+
+  <div id="vignette"></div>
+  <div id="grad-bottom"></div>
+  <div id="scan"></div>
+
+  <div id="hud-border"></div>
+
+  <div id="cursor">
+    <div id="cursor-ring"><div id="cursor-dot"></div></div>
+  </div>
+
+  <div id="app">
+
+    <div id="header">
+      <div class="stamp">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <p>EQUIPO</p><p>OMNIC</p>
+      </div>
+      <div class="emergency-bar">
+        <p class="eyebrow">Protocolo de emergencia</p>
+      </div>
+    </div>
+
+    <div id="top-right">
+      <span class="red-dot"></span> v1.0.0 - 2026
+    </div>
+
+    <div id="middle">
+  <span class="logo-main">OUTBREAK</span>
+      <p class="logo-sub">survival horror <span class="text-red">multiplayer</span></p>
+      <p class="lore">
+        El virus se propagó en 72 horas.<br>
+        Las ciudades cayeron. Los refugios, traicionados.<br>
+        Solo quedan los que aún no saben que están muertos.
+      </p>
+    </div>
+
+    <div id="footer">
+      <div class="coord-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/><path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"/><path d="M12 9V5M9.40192 13.5L5.93782 15.5M14.5981 13.5L18.0622 15.5"/></svg>
+      </div>
+      <div class="coord-group">
+        <span class="coord-label">+ Latitud</span>
+        <span class="coord-val">25.6866° N</span>
+      </div>
+      <div class="coord-sep"></div>
+      <div class="coord-group">
+        <span class="coord-label">Longitud</span>
+        <span class="coord-val">100.3161° W</span>
+      </div>
+      <div class="coord-sep"></div>
+      <div class="coord-group">
+        <span class="coord-label">Altitud +</span>
+        <span class="coord-val">538m</span>
+      </div>
+    </div>
+
+    <nav id="nav">
+        <a class="menu-btn" href="Select.html">
+        <div class="btn-icon">
+    
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20Z"/><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M12 9V4M8.536 14l-4.33-2.5M15.464 14l4.33-2.5"/></svg>
+        </div>
+        <span class="btn-label">JUGAR</span>
+      </a>
+
+      <button class="menu-btn" onclick="window.location.href='multiplayer.html'">
+        <div class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <span class="btn-label">MULTIJUGADOR</span>
+      </button>
+
+      <a class="menu-btn" href="Scores.html">
+        <div class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+        </div>
+        <span class="btn-label">PUNTUACIONES</span>
+      </a>
+
+      <a class="menu-btn" href="Settings.html">
+        <div class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+        </div>
+        <span class="btn-label">CONFIGURACIÓN</span>
+      </a>
+
+      <button class="menu-btn" onclick="window.close()">
+        <div class="btn-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </div>
+        <span class="btn-label">SALIR</span>
+      </button>
+    </nav>
+
+    <div id="system-status">
+      <p class="sys-label"><span class="red-dot"></span> ESTADO DEL SISTEMA</p>
+      <div class="alert-row">
+        <p class="sys-alert">ALERTA ROJA</p>
+        <svg class="ekg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h4l2 -6 4 12 2 -6h6"/></svg>
+      </div>
+      <p class="sys-threat">NIVEL DE AMENAZA: <span class="threat-red">CRÍTICO</span></p>
+      <p class="sys-footer">Primera Entrega</p>
+    </div>
+
+  </div>
+
+<script>
+  // Código del cursor 
+  const cur = document.getElementById('cursor');
+  document.addEventListener('mousemove', e => {
+    cur.style.left = e.clientX + 'px';
+    cur.style.top  = e.clientY + 'px';
+  });
+
+  // Lógica mejorada para el loop "Ping-Pong"
+  const video = document.getElementById('bg-gif');
+  let isReversing = false;
+
+  // Cuando el video termina (llega al final)
+  video.addEventListener('ended', () => {
+    isReversing = true;
+    video.pause();
+    reversePlayback(); // Iniciamos la reproducción invertida
+  });
+
+  function reversePlayback() {
+    if (!isReversing) return;
+
+    // Restamos tiempo por cada frame (Ajusta este número, ej. 0.03 o 0.05, según la velocidad que prefieras)
+    video.currentTime -= 0.03;
+
+    // Si ya llegamos al inicio (usamos 0.05 de margen de error en lugar de 0 exacto)
+    if (video.currentTime <= 0.05) {
+      isReversing = false;       // Detenemos el estado de reversa
+      video.currentTime = 0;     // Forzamos el inicio exacto
+      video.play();              // Volvemos a reproducir hacia adelante (creando el loop)
+    } else {
+      // Pedimos al navegador que ejecute esto en el siguiente frame disponible
+      requestAnimationFrame(reversePlayback);
+    }
+  }
+</script>
+</body>
+</html>

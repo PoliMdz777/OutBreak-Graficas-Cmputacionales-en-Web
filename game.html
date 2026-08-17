@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OUTBREAK — Juego</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+  <style>
+    :root {
+      --text-dim: rgba(200,150,150,0.6);
+      --dark4: rgba(20,5,5,0.8);
+      --gray: rgba(180,0,0,0.3);
+      --gray2: rgba(180,0,0,0.5);
+      --blood-light: #ff4444;
+      --blood: #cc2222;
+      --blood-glow: #ff2222;
+      --white: #e8e8e8;
+      --text: #ccc;
+      --dark3: #110505;
+    }
+    
+    body { overflow: hidden; width: 100vw; height: 100vh; margin: 0; font-family: 'Oswald', sans-serif;}
+
+    /* ── CANVAS ── */
+    #gameCanvas {
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      background: #050101;
+    }
+
+    /* ── HUD ── */
+    #hud {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    /* Top izquierdo: vida y MAPA */
+    #hud-top-left {
+      position: absolute;
+      top: 14px; left: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+
+    .hud-label { font-size: 10px; color: var(--text-dim); letter-spacing: 2px; margin-bottom: 2px; }
+    .health-bar { width: 140px; height: 8px; background: var(--dark4); border: 1px solid var(--gray); border-radius: 2px; overflow: hidden; }
+    .health-fill { height: 100%; background: var(--blood-light); border-radius: 1px; transition: width 0.3s; }
+    .health-val { font-size: 11px; color: var(--blood-light); letter-spacing: 1px; margin-top: 2px;}
+
+    /* NUEVO: Indicador de Mapa */
+    .map-name-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 18px;
+      color: var(--white);
+      letter-spacing: 2px;
+      text-shadow: 0 0 10px rgba(200,34,34,0.5);
+    }
+
+    /* Top centro: oleada */
+    #hud-wave {
+      position: absolute;
+      top: 14px; left: 50%; transform: translateX(-50%);
+      text-align: center;
+    }
+    .wave-label { font-size: 10px; color: var(--text-dim); letter-spacing: 3px; }
+    .wave-num { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: var(--blood-glow); line-height: 1; text-shadow: 0 0 15px var(--blood);}
+
+    /* Top derecho: puntos + munición */
+    #hud-score {
+      position: absolute;
+      top: 14px; right: 14px;
+      text-align: right;
+    }
+    .score-val { font-family: 'Bebas Neue', sans-serif; font-size: 24px; color: var(--white); letter-spacing: 2px; }
+    .ammo-val  { font-size: 14px; color: var(--text); letter-spacing: 1px; }
+    .ammo-val span { font-size: 11px; color: var(--text-dim); }
+
+    /* Centro: mira */
+    #crosshair {
+      position: absolute;
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      opacity: 0.75;
+    }
+
+    /* Bottom izquierdo: ítems */
+    #hud-items {
+      position: absolute;
+      bottom: 14px; left: 14px;
+      display: flex; gap: 8px;
+    }
+    .item-slot {
+      width: 48px; height: 48px;
+      background: rgba(0,0,0,0.65);
+      border: 1px solid var(--gray2);
+      border-radius: 4px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      position: relative;
+      pointer-events: all;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .item-slot:hover  { border-color: var(--blood-light); }
+    .item-slot.active { border-color: var(--blood-glow); box-shadow: inset 0 0 10px rgba(200,0,0,0.3); }
+    .item-count {
+      position: absolute; bottom: 2px; right: 5px;
+      font-size: 10px; color: var(--blood-light);
+    }
+
+    /* Bottom centro: jugadores online */
+    #hud-players {
+      position: absolute;
+      bottom: 14px; left: 50%; transform: translateX(-50%);
+      text-align: center;
+    }
+    .players-label { font-size: 9px; color: var(--text-dim); letter-spacing: 1px; margin-bottom: 4px; }
+    .players-row { display: flex; gap: 6px; justify-content: center; }
+    .player-pip {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--dark3); border: 1px solid var(--blood);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; color: var(--text-dim);
+    }
+    .player-pip.you { border-color: var(--blood-glow); color: var(--blood-glow); box-shadow: 0 0 8px rgba(200,0,0,0.4);}
+
+    /* Bottom derecho: minimapa */
+    #minimap {
+      position: absolute;
+      bottom: 14px; right: 14px;
+      width: 90px; height: 70px;
+      background: rgba(0,0,0,0.75);
+      border: 1px solid var(--blood);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    #minimap canvas { width: 100%; height: 100%; }
+    .minimap-label { font-size: 8px; color: var(--blood); letter-spacing: 2px; padding: 2px 5px; position: absolute; background: rgba(0,0,0,0.5);}
+
+    /* Alerta de oleada */
+    #wave-alert {
+      position: absolute;
+      top: 56%; left: 50%; transform: translate(-50%, -50%);
+      background: rgba(139,0,0,0.25);
+      border: 1px solid var(--blood);
+      padding: 6px 24px;
+      font-size: 13px; letter-spacing: 4px; color: var(--blood-glow);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #wave-alert.show { opacity: 1; }
+
+    /* ── MENÚ DE PAUSA ── */
+    #pause-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      pointer-events: all;
+    }
+    #pause-overlay.visible { display: flex; }
+
+    .pause-panel {
+      background: rgba(10,5,5,0.95);
+      border: 1px solid var(--blood);
+      padding: 2rem 2.5rem;
+      width: 320px;
+      text-align: center;
+      position: relative;
+      box-shadow: 0 0 30px rgba(200,0,0,0.2);
+    }
+    .pause-title {
+      font-family: 'Bebas Neue', cursive;
+      font-size: 42px; color: var(--blood-glow);
+      letter-spacing: 5px; margin-bottom: 15px;
+    }
+    .pause-stats {
+      display: flex; justify-content: center; gap: 0;
+      margin-bottom: 1.5rem;
+      background: var(--dark3);
+      border: 1px solid var(--gray);
+    }
+    .pause-stat { flex: 1; padding: 10px 0; }
+    .pause-stat + .pause-stat { border-left: 1px solid var(--gray); }
+    .pstat-val   { font-family: 'Bebas Neue', sans-serif; font-size: 26px; color: var(--blood-light); }
+    .pstat-label { font-size: 9px;  color: var(--text-dim); letter-spacing: 2px; }
+    .pause-nav { display: flex; flex-direction: column; gap: 8px; }
+    
+    .pause-nav button {
+      background: rgba(200,0,0,0.1);
+      border: 1px solid var(--gray2);
+      color: var(--white);
+      padding: 10px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 16px;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pause-nav button:hover {
+      background: rgba(200,0,0,0.4);
+      border-color: var(--blood-light);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="gameCanvas"></canvas>
+
+  <div id="hud">
+
+    <div id="hud-top-left">
+      <div>
+        <div class="hud-label">VIDA</div>
+        <div class="health-bar"><div class="health-fill" id="health-fill" style="width:100%"></div></div>
+        <div class="health-val"><span id="health-cur">100</span> / <span id="health-max">100</span></div>
+      </div>
+      <div>
+        <div class="hud-label">ZONA ACTIVA</div>
+        <div class="map-name-val" id="active-map-name">CARGANDO...</div>
+      </div>
+    </div>
+
+    <div id="hud-wave">
+      <div class="wave-label">OLEADA</div>
+      <div class="wave-num" id="wave-num">01</div>
+    </div>
+
+    <div id="hud-score">
+      <div class="hud-label">PUNTOS</div>
+      <div class="score-val" id="score-val">0</div>
+      <div class="ammo-val" id="ammo-val">30 <span>/ 90 BALAS</span></div>
+    </div>
+
+    <div id="crosshair">
+      <svg width="32" height="32" viewBox="0 0 32 32">
+        <line x1="16" y1="3"  x2="16" y2="11" stroke="#C0392B" stroke-width="1.5"/>
+        <line x1="16" y1="21" x2="16" y2="29" stroke="#C0392B" stroke-width="1.5"/>
+        <line x1="3"  y1="16" x2="11" y2="16" stroke="#C0392B" stroke-width="1.5"/>
+        <line x1="21" y1="16" x2="29" y2="16" stroke="#C0392B" stroke-width="1.5"/>
+        <circle cx="16" cy="16" r="2" fill="none" stroke="#C0392B" stroke-width="1"/>
+      </svg>
+    </div>
+
+    <div id="hud-items">
+      <div class="item-slot active" title="Botiquín [1]">🩹<span class="item-count" id="item0-count">×2</span></div>
+      <div class="item-slot"       title="Batería [2]" >🔦<span class="item-count" id="item1-count">×1</span></div>
+      <div class="item-slot"       title="Munición [3]">🔫<span class="item-count" id="item2-count">×3</span></div>
+    </div>
+
+    <div id="hud-players">
+      <div class="players-label">EN LÍNEA</div>
+      <div class="players-row">
+        <div class="player-pip you">TÚ</div>
+        <div class="player-pip" id="pip-p2" style="opacity:0.4">P2</div>
+        <div class="player-pip" id="pip-p3" style="opacity:0.4">P3</div>
+      </div>
+    </div>
+
+    <div id="minimap">
+      <div class="minimap-label">RADAR</div>
+      <canvas id="minimapCanvas" width="90" height="70"></canvas>
+    </div>
+
+    <div id="wave-alert">⚠ OLEADA ENTRANTE</div>
+
+  </div>
+
+  <div id="pause-overlay">
+    <div class="pause-panel">
+      <div class="pause-title">PAUSA</div>
+      <div class="pause-stats">
+        <div class="pause-stat">
+          <div class="pstat-val" id="p-wave">01</div>
+          <div class="pstat-label">OLEADA</div>
+        </div>
+        <div class="pause-stat">
+          <div class="pstat-val" id="p-kills">0</div>
+          <div class="pstat-label">BAJAS</div>
+        </div>
+        <div class="pause-stat">
+          <div class="pstat-val" id="p-score">0</div>
+          <div class="pstat-label">PUNTOS</div>
+        </div>
+      </div>
+      <div class="pause-nav">
+        <button onclick="resumeGame()">▶ CONTINUAR</button>
+        <button onclick="restartGame()">↺ REINICIAR</button>
+        <button onclick="location.href='settings.html'">⚙ CONFIGURACIÓN</button>
+        <button onclick="location.href='Menu.html'">✕ SALIR AL MENÚ</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ─── Lógica para Leer el Mapa de la URL ─── */
+    // Esto busca el parámetro "?map=" en la dirección web
+    const urlParams = new URLSearchParams(window.location.search);
+    const selectedMap = urlParams.get('map') || 'ZONA DE PRUEBAS';
+    
+    // Lo escribe en el HUD
+    document.getElementById('active-map-name').textContent = selectedMap;
+
+    /* ─── Estado del juego ─── */
+    const game = {
+      paused:  false,
+      wave:    1,
+      score:   0,
+      kills:   0,
+      health:  100,
+      maxHealth: 100,
+      ammo:    30,
+      maxAmmo: 90,
+      items:   [2, 1, 3],   
+    };
+
+    /* ─── Actualizar HUD ─── */
+    function updateHUD() {
+      document.getElementById('health-fill').style.width = (game.health / game.maxHealth * 100) + '%';
+      document.getElementById('health-cur').textContent  = game.health;
+      document.getElementById('wave-num').textContent    = String(game.wave).padStart(2, '0');
+      document.getElementById('score-val').textContent   = game.score.toLocaleString();
+      document.getElementById('ammo-val').innerHTML      = `${game.ammo} <span>/ ${game.maxAmmo} BALAS</span>`;
+      document.getElementById('item0-count').textContent = `×${game.items[0]}`;
+      document.getElementById('item1-count').textContent = `×${game.items[1]}`;
+      document.getElementById('item2-count').textContent = `×${game.items[2]}`;
+      document.getElementById('p-wave').textContent  = String(game.wave).padStart(2, '0');
+      document.getElementById('p-kills').textContent = game.kills;
+      document.getElementById('p-score').textContent = game.score.toLocaleString();
+    }
+
+    /* ─── Alerta de oleada ─── */
+    function showWaveAlert() {
+      const el = document.getElementById('wave-alert');
+      el.classList.add('show');
+      setTimeout(() => el.classList.remove('show'), 2500);
+    }
+
+    /* ─── Pausa ─── */
+    function pauseGame() {
+      game.paused = true;
+      document.getElementById('pause-overlay').classList.add('visible');
+    }
+    function resumeGame() {
+      game.paused = false;
+      document.getElementById('pause-overlay').classList.remove('visible');
+    }
+    function restartGame() {
+      game.wave = 1; game.score = 0; game.kills = 0;
+      game.health = game.maxHealth; game.ammo = 30;
+      game.items = [2, 1, 3];
+      resumeGame();
+      updateHUD();
+    }
+
+    /* ─── Teclado ─── */
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') game.paused ? resumeGame() : pauseGame();
+    });
+
+    /* ─── Minimapa placeholder ─── */
+    function drawMinimap() {
+      const c = document.getElementById('minimapCanvas');
+      const ctx = c.getContext('2d');
+      ctx.clearRect(0, 0, c.width, c.height);
+      ctx.fillStyle = 'rgba(139,0,0,0.15)';
+      ctx.fillRect(0, 0, c.width, c.height);
+      /* Jugador */
+      ctx.beginPath();
+      ctx.arc(45, 35, 4, 0, Math.PI*2);
+      ctx.fillStyle = '#E74C3C';
+      ctx.fill();
+      /* Enemigos ficticios */
+      [[20,20],[65,45],[30,50]].forEach(([x,y]) => {
+        ctx.beginPath();
+        ctx.arc(x, y, 3, 0, Math.PI*2);
+        ctx.fillStyle = '#ff6b6b';
+        ctx.fill();
+      });
+    }
+
+    /* ─── Demo: simular puntos y olas ─── */
+    setInterval(() => {
+      if (game.paused) return;
+      game.score += Math.floor(Math.random() * 50);
+      if (game.score > 0 && game.score % 2000 < 50) {
+        game.wave++;
+        game.kills += Math.floor(Math.random() * 20 + 10);
+        showWaveAlert();
+      }
+      updateHUD();
+      drawMinimap();
+    }, 500);
+
+    /* ─── Init ─── */
+    updateHUD();
+    drawMinimap();
+    showWaveAlert();
+  </script>
+</body>
+</html>

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OUTBREAK — Puntuaciones</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Special+Elite&family=Oswald:wght@300;400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/Scores.css" />
+</head>
+<body>
+
+  <video id="bg-gif" autoplay muted loop playsinline>
+    <source src="multimedia/Menu.mp4" type="video/mp4">
+  </video>
+  <div id="vignette"></div>
+  <div id="grad-bottom"></div>
+  <div id="scan"></div>
+  <div id="hud-border"></div>
+
+  <div id="cursor">
+    <div id="cursor-ring"><div id="cursor-dot"></div></div>
+  </div>
+
+  <div id="app">
+
+    <!-- TOP LEFT -->
+    <div id="header">
+      <div class="stamp">
+        <span class="corner-tl"></span><span class="corner-br"></span>
+        <p>EQUIPO</p><p>OMNIC</p>
+      </div>
+      <p class="eyebrow">Protocolo de emergencia</p>
+    </div>
+
+    <!-- TOP RIGHT -->
+    <div id="top-right">
+      <span class="red-dot"></span> v1.0.0 - 2026
+    </div>
+
+    <!-- CENTRO — todo el panel de scores -->
+    <div id="middle">
+
+      <div class="screen-header">
+        <h1 class="screen-title">PUNTUACIONES</h1>
+        <button class="back-btn" onclick="location.href='Menu.html'">← REGRESAR</button>
+      </div>
+
+      <div class="scores-panel">
+        <div class="panel-inner">
+
+          <div class="tabs" id="tabs">
+            <button class="tab active" onclick="switchTab('survival',this)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+              <span class="tab-label">SUPERVIVENCIA</span>
+            </button>
+            <button class="tab" onclick="switchTab('escape',this)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              <span class="tab-label">ESCAPE</span>
+            </button>
+            <button class="tab" onclick="switchTab('global',this)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+              <span class="tab-label">GLOBAL</span>
+            </button>
+          </div>
+
+          <div class="table-scroll" id="scores-container">
+            <div class="empty-msg">CARGANDO DATOS...</div>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /#middle -->
+
+    <!-- BOTTOM LEFT -->
+    <div id="footer">
+      <div class="coord-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/><path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z"/><path d="M12 9V5M9.40192 13.5L5.93782 15.5M14.5981 13.5L18.0622 15.5"/></svg>
+      </div>
+      <div class="coord-group">
+        <span class="coord-label">+ Latitud</span>
+        <span class="coord-val">25.6866° N</span>
+      </div>
+      <div class="coord-sep"></div>
+      <div class="coord-group">
+        <span class="coord-label">Longitud</span>
+        <span class="coord-val">100.3161° W</span>
+      </div>
+      <div class="coord-sep"></div>
+      <div class="coord-group">
+        <span class="coord-label">Altitud +</span>
+        <span class="coord-val">538m</span>
+      </div>
+    </div>
+
+    <!-- BOTTOM RIGHT -->
+    <div id="system-status">
+      <p class="sys-label"><span class="red-dot"></span> ESTADO DEL SISTEMA</p>
+      <div class="alert-row">
+        <p class="sys-alert">ALERTA ROJA</p>
+        <svg class="ekg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12h4l2 -6 4 12 2 -6h6"/></svg>
+      </div>
+      <p class="sys-threat">NIVEL DE AMENAZA: <span class="threat-red">CRÍTICO</span></p>
+      <p class="sys-footer">Primera Entrega</p>
+    </div>
+
+  </div><!-- /#app -->
+
+  <script>
+    // Cursor
+    const cur = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cur.style.left = e.clientX + 'px';
+      cur.style.top  = e.clientY + 'px';
+    });
+
+    const playerName = JSON.parse(localStorage.getItem('outbreak_config') || '{}').playerName || 'NeroDubs';
+
+    const mockData = {
+      survival: [
+        { name:'DarkSurvivor',  wave:18, kills:347, points:98450 },
+        { name:'ZombieSlayer',  wave:15, kills:289, points:82100 },
+        { name:'SpeedRunner',   wave:13, kills:241, points:88200 },
+        { name:'Outbreak_X',    wave:11, kills:198, points:59800 },
+        { name: playerName,     wave: 9, kills:156, points:99500 },
+        { name:'NightCrawler',  wave: 7, kills:120, points:71300 },
+        { name:'SilentKnight',  wave: 6, kills: 98, points:47800 },
+        { name:'RedMist',       wave: 4, kills: 64, points:31000 },
+        { name:'BioHazard_7',   wave: 3, kills: 41, points:24500 },
+        { name:'Phantom_Z',     wave: 2, kills: 28, points:15200 },
+        { name:'LostSoul99',    wave: 2, kills: 21, points:12800 },
+        { name:'Infected01',    wave: 1, kills: 11, points: 6400 },
+      ],
+      escape: [
+        { name:'SpeedRunner',   time:'02:14', kills:42, points:88200 },
+        { name:'GhostWalker',   time:'02:31', kills:38, points:76400 },
+        { name: playerName,     time:'03:05', kills:29, points:55300 },
+        { name:'SilentKnight',  time:'03:22', kills:25, points:47800 },
+        { name:'Outbreak_X',    time:'03:58', kills:19, points:33200 },
+        { name:'Phantom_Z',     time:'04:11', kills:14, points:27600 },
+        { name:'NightCrawler',  time:'04:44', kills:11, points:21000 },
+      ],
+      global: []
+    };
+
+    const combined = {};
+    [...mockData.survival, ...mockData.escape].forEach(e => {
+      combined[e.name] = (combined[e.name] || 0) + (e.points || 0);
+    });
+    mockData.global = Object.entries(combined)
+      .map(([name, points]) => ({ name, points }))
+      .sort((a, b) => b.points - a.points);
+
+    function rankClass(i) {
+      return ['rank-1','rank-2','rank-3'][i] || 'rank-n';
+    }
+
+    function switchTab(tab, btn) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      renderTable(tab);
+    }
+
+    function renderTable(tab) {
+      const data = [...(mockData[tab] || [])].sort((a,b) => b.points - a.points);
+      if (!data.length) {
+        document.getElementById('scores-container').innerHTML = '<div class="empty-msg">SIN DATOS DISPONIBLES</div>';
+        return;
+      }
+      const isSurvival = tab === 'survival';
+      const isEscape   = tab === 'escape';
+
+      let thead = '<tr><th>#</th><th>JUGADOR</th>';
+      if (isSurvival) thead += '<th>OLEADA</th><th>BAJAS</th>';
+      if (isEscape)   thead += '<th>TIEMPO</th><th>BAJAS</th>';
+      thead += '<th>PUNTOS</th></tr>';
+
+      const rows = data.map((row, i) => {
+        const isYou = row.name === playerName;
+        let r = `<tr class="${isYou ? 'you-row' : ''}">`;
+        r += `<td><span class="rank ${rankClass(i)}">${i+1}</span></td>`;
+        r += `<td class="${isYou ? 'you-name' : ''}">${row.name}${isYou ? '<span class="you-star">★</span>' : ''}</td>`;
+        if (isSurvival) r += `<td><span class="stat-pill">OLA ${row.wave ?? '-'}</span></td><td>${row.kills ?? '-'}</td>`;
+        if (isEscape)   r += `<td><span class="stat-pill">${row.time ?? '-'}</span></td><td>${row.kills ?? '-'}</td>`;
+        r += `<td class="score-num">${row.points.toLocaleString()}</td>`;
+        r += '</tr>';
+        return r;
+      }).join('');
+
+      document.getElementById('scores-container').innerHTML = `
+        <table class="scores-table">
+          <thead>${thead}</thead>
+          <tbody>${rows}</tbody>
+        </table>`;
+    }
+
+    async function loadScores(tab) {
+      try {
+        const res = await fetch(`backend/api.php?action=scores&mode=${tab}`);
+        if (!res.ok) throw new Error();
+        const json = await res.json();
+        if (json.data) mockData[tab] = json.data;
+      } catch { /* usa mock */ }
+      renderTable(tab);
+    }
+
+    loadScores('survival');
+  </script>
+</body>
+</html>
